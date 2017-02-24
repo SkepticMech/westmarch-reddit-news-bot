@@ -171,24 +171,15 @@ def get_sums(f):
 
 def get_renown(players, names):
     ren = open("renown.txt", "w+")
-    ren.write("If adding a new user or editing, please follow the formatting:  \n\nuser:`space`username`space``space`|name:`space`character name`space``space`|npcname:`space`renown#`space``space`|`space``space``space``space`  \n\nOr the code won't work for the bot.  \n\n&nbsp;  \n\nUser | Name | Dina Stumbletoe | Ilbryn Vulre | Medwin of Llanport | Lundrak Honorgrip\n-|-|-|-|-|-\n")
+    ren.write("If adding a new user or editing, please follow the formatting:  \n\nuser:`space`username|name:`space`character name|npcname:`space`renown#|`newline`\n\nOr the code won't work for the bot.  \n\n&nbsp;  \n\nUser | Name | Dina Stumbletoe | Ilbryn Vulre | Medwin of Llanport | Lundrak Honorgrip\n-|-|-|-|-|-\n")
     Wiki = r.subreddit("AdventuresInWestmarch").wiki["renown"]
-    START1 = "user: "
-    START2 = "name: "
-    START3 = "dina: "
-    START4 = "ilbryn: "
-    START5 = "medwin: "
-    START6 = "lundrak: "
-    END = "  "
-    start1 = "user: "
-    end1 = "    "
-    m1 = re.compile(r'%s(.*?)%s' % (START1,END))
-    m2 = re.compile(r'%s(.*?)%s' % (START2,END))
-    m3 = re.compile(r'%s(.*?)%s' % (START3,END))
-    m4 = re.compile(r'%s(.*?)%s' % (START4,END))
-    m5 = re.compile(r'%s(.*?)%s' % (START5,END))
-    m6 = re.compile(r'%s(.*?)%s' % (START6,END))
-    m7 = re.compile(r'%s.*?%s' % (start1,end1))
+    m1 = re.compile(r'user: (.*?)\|')
+    m2 = re.compile(r'name: (.*?)\|')
+    m3 = re.compile(r'dina: (.*?)\|')
+    m4 = re.compile(r'ilbryn: (.*?)\|')
+    m5 = re.compile(r'medwin: (.*?)\|')
+    m6 = re.compile(r'lundrak: (.*?)\|')
+    m7 = re.compile(r'user:.*?\n')
     userids = m1.findall(Wiki.content_md)
     usernms = m2.findall(Wiki.content_md)
     dina = [int(i) for i in (m3.findall(Wiki.content_md))]
@@ -209,7 +200,7 @@ def get_renown(players, names):
             for cnt in range(len(misgn)):
                 userids.append(misgu[cnt])
                 usernms.append(misgn[cnt])
-                ren.write("user: " + misgu[cnt] + "  |name: " + misgn[cnt] + "  |dina: 1  |ilbryn: 1  |medwin: 1  |lundrak: 1  |    \n")
+                ren.write("user: " + misgu[cnt] + "|name: " + misgn[cnt] + "|dina: 1|ilbryn: 1|medwin: 1|lundrak: 1|\n")
     ren.close
     with open("renown.txt", "r") as ren:
         bodyw = ren.read()
@@ -291,7 +282,7 @@ with open("msg.txt", "r") as f:
  
  
  
-r.subreddit('AdventuresInWestmarch').submit(title = title, selftext = bodyt)
+# r.subreddit('AdventuresInWestmarch').submit(title = title, selftext = bodyt)
 # r.subreddit('test').submit(title = title, selftext = bodyt)
 
 # run_bot(r)
