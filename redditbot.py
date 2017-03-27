@@ -2,6 +2,7 @@
 '''
 Created on Feb 21, 2017
 
+@author: Nick
 '''
 print
 import time
@@ -318,7 +319,11 @@ def get_players():
             py.write(user.name + "\t" + flair['flair_text'] + "\t" + flair['flair_css_class'] + "\n")
     py.close()
     clasdic = {"barb":"barbarian", "fight":"fighter", "palad":"paladin", "rang":"ranger", "sorc":"sorcerer", "war":"warlock", "wiz":"wizard"}
-    classes = [clasdic[n] if n in clasdic else n for n in clases]
+    classest = [clasdic[n] if n in clasdic else n for n in clases]
+    classes = {names[0]: classest[0]}
+    for cnts in range(1, len(names)):
+        dtemp = {names[cnts]: classest[cnts]}
+        classes.update(dtemp)
     return (players, names, classes)
 
 def get_sums():
@@ -376,10 +381,10 @@ def get_renown(posts):
         holders = alldata[cntr]
         userides.append(holders[0])
         usernames.append(holders[1])
-        dinas.append(holders[2])
-        ilbryns.append(holders[3])
-        medwins.append(holders[4])
-        lundraks.append(holders[5])
+        dinas.append(int(holders[2]))
+        ilbryns.append(int(holders[3]))
+        medwins.append(int(holders[4]))
+        lundraks.append(int(holders[5]))
     repetco = []
     repetci = []
     for spot in range(len(players)):
@@ -393,7 +398,7 @@ def get_renown(posts):
             repetci[pers] = repetco[pers]
         usernames[userides.index(pers)] = repetci[pers]
     for cnt in range(len(usernames)):
-        ren.write(userides[cnt] + "|" + usernames[cnt] + "|" + dinas[cnt] + "|" + ilbryns[cnt] + "|" + medwins[cnt] + "|" + lundraks[cnt] + "\n")
+        ren.write(userides[cnt] + "|" + usernames[cnt] + "|" + str(dinas[cnt]) + "|" + str(ilbryns[cnt]) + "|" + str(medwins[cnt]) + "|" + str(lundraks[cnt]) + "\n")
     misgu1 = OrderedDict.fromkeys(players)
     misgu2 = OrderedDict.fromkeys(userides)
     misgu = [x for x in misgu1 if x not in misgu2]
@@ -407,9 +412,12 @@ def get_renown(posts):
             ren.write(misgu[cnt] + "|" + misgn[cnt] + "|1|1|1|1\n")
     with open("renown.txt", "r") as ren:
         bodyw = ren.read()
+    newclasses = []
+    for nmsc in usernames:
+        newclasses.append(classes[nmsc])
     if posts == 1:
         r.subreddit("AdventuresInWestmarch").wiki["renown"].edit(bodyw, reason='matching to flair list')
-    return(userides, usernames, dinas, ilbryns, medwins, lundraks)
+    return(userides, usernames, dinas, ilbryns, medwins, lundraks, newclasses)
 def get_rums(posts):
     """
     Selects several rumours for the week and alerts the relevent users:
@@ -446,7 +454,7 @@ def get_rums(posts):
             dave.write("Medwin places bounty on " + monst[monch] + " (" + discs[monch] + ") to all players at renown: " + str(medren) + " or above.\n\n")
             medppl = [i for i, v in enumerate(medwin) if v >= medren]
             for dis in medppl:
-                msg = "Hello " + usernms[dis] + ",\n&nbsp;\n\nYou seem to be quite the reliable " + classes[dis] + ", so I will let you in on this a bit early. Lately, I've head some trouble with " + monst[monch] + " threatening the town, so I've decided to enlist some help by placing a bounty. If you can put an end to this mess, its all yours.\n&nbsp;\n\nAs my monther used to say, " + choice(medwins) + "\n&nbsp;\n\nBest of luck,\n\nMedwin of Llanport"
+                msg = "Hello " + usernms[dis] + ",\n&nbsp;\n\nYou seem to be quite the reliable " + nclasses[dis] + ", so I will let you in on this a bit early. Lately, I've head some trouble with " + monst[monch] + " threatening the town, so I've decided to enlist some help by placing a bounty. If you can put an end to this mess, its all yours.\n&nbsp;\n\nAs my monther used to say, " + choice(medwins) + "\n&nbsp;\n\nBest of luck,\n\nMedwin of Llanport"
                 if posts == 1:
                     r.redditor(str(userids[dis])).message('Bounty for the taking', msg)
         elif elms == 'b':
@@ -542,11 +550,12 @@ def get_rums(posts):
             helpfile = "help\\help-" + htype + ".txt"
             with open(helpfile, "r") as helpst:
                 helpm = helpst.read()
-            reker1 = choice(userids)
-            reker = str(reker1[0])
-            dave.write(reker + " has received a message asking for help, language: " + htype + ".\n\n")
+            playpicer = choice(range(len(usernms)))
+            playid = userids[playpicer]
+            playnm = usernms[playpicer]
+            dave.write(playnm + " (" + playid + ") has received a message asking for help, language: " + htype + ".\n\n")
             if posts == 1:
-                r.redditor(reker).message('A crumpled note', helpm)
+                r.redditor(playid).message('A crumpled note', helpm)
         elif elms == 'j':
             seelie = 1
             nullist = 0
@@ -595,7 +604,7 @@ with open("npcs\\medwin.txt", "r") as medwinst:
     medwins = list(filter(None, medwins))
 titlep = get_title()
 (players, names, classes) = get_players()
-(userids, usernms, dina, ilbryn, medwin, lundrak) = get_renown(post)
+(userids, usernms, dina, ilbryn, medwin, lundrak, nclasses) = get_renown(post)
 get_rums(post)
 get_weatherb()
 get_sums()
